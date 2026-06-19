@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>投票アプリ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .container {
+      background: white;
+      max-width: 500px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .option {
+      margin: 15px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #fafafa;
+      transition: 0.2s;
+    }
+
+    .option:hover {
+      background: #e8f0ff;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .result {
+      margin-top: 30px;
+      text-align: left;
+    }
+
+    .bar {
+      height: 24px;
+      background: #2563eb;
+      color: white;
+      text-align: right;
+      padding-right: 8px;
+      line-height: 24px;
+      border-radius: 6px;
+      margin-top: 5px;
+    }
+
+    .message {
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>好きな言語に投票してください</h1>
+
+    <div class="option">
+      <label>
+        <input type="radio" name="vote" value="JavaScript">
+        JavaScript
+      </label>
+    </div>
+
+    <div class="option">
+      <label>
+        <input type="radio" name="vote" value="Python">
+        Python
+      </label>
+    </div>
+
+    <div class="option">
+      <label>
+        <input type="radio" name="vote" value="Java">
+        Java
+      </label>
+    </div>
+
+    <button onclick="submitVote()">投票する</button>
+
+    <div class="message" id="message"></div>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const votes = {
+      "JavaScript": 0,
+      "Python": 0,
+      "Java": 0
+    };
+
+    function submitVote() {
+      const selected = document.querySelector('input[name="vote"]:checked');
+
+      if (!selected) {
+        alert("投票する項目を選んでください。");
+        return;
+      }
+
+      const choice = selected.value;
+      votes[choice]++;
+
+      document.getElementById("message").textContent =
+        choice + " に投票しました！";
+
+      showResults();
+    }
+
+    function showResults() {
+      const resultDiv = document.getElementById("result");
+      const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
+
+      let html = "<h2>投票結果</h2>";
+
+      for (const option in votes) {
+        const count = votes[option];
+        const percent = totalVotes === 0 ? 0 : Math.round((count / totalVotes) * 100);
+
+        html += `
+          <div>
+            <strong>${option}</strong>：${count}票 (${percent}%)
+            <div class="bar" style="width:${percent}%">${percent}%</div>
+          </div>
+        `;
+      }
+
+      resultDiv.innerHTML = html;
+    }
+
+    showResults();
+  </script>
+
+</body>
+</html>
+``
