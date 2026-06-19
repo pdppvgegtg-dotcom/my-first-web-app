@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>みんなでリアルタイム投票アプリ</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f0f2f5; }
+        .box { background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        button { font-size: 18px; padding: 10px 20px; margin: 10px; cursor: pointer; border: none; border-radius: 5px; background: #007bff; color: white; }
+        button:hover { background: #0056b3; }
+        .result { font-size: 24px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2>犬派？猫派？ どっちが好き？</h2>
+        
+        <button onclick="vote('dog')">🐶 犬派に投票</button>
+        <button onclick="vote('cat')">🐱 猫派に投票</button>
+
+        <div class="result">
+            <p>🐶 犬派: <span id="dog-count">0</span> 票</p>
+            <p>🐱 猫派: <span id="cat-count">0</span> 票</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, runTransaction, onValue } 
+        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+        apiKey: "AIzaSyAKcicyPyr8-u-zhDPtwWwkD2AXGXhAXnc",
+        authDomain: "my-second-site-f8456.firebaseapp.com",
+        projectId: "my-second-site-f8456",
+        storageBucket: "my-second-site-f8456.firebasestorage.app",
+        messagingSenderId: "518798934752",
+        appId: "1:518798934752:web:70a89a42ba255dfe524685",
+        measurementId: "G-21H1LNTLL8"
+        };
+
+        // Firebaseを起動
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 1. データベースから現在の投票数をリアルタイムに読み込んで画面に表示する
+        onValue(ref(db, 'votes'), (snapshot) => {
+            const data = snapshot.val() || { dog: 0, cat: 0 };
+            document.getElementById('dog-count').innerText = data.dog || 0;
+            document.getElementById('cat-count').innerText = data.cat || 0;
+        });
+
+        // 2. ボタンが押されたら、データを1増やす（投票する）関数
+        window.vote = function(type) {
+            const voteRef = ref(db, `votes/${type}`);
+            // 他の人と同時にボタンを押してもデータがバグらないように安全に1増やす処理（トランザクション）
+            runTransaction(voteRef, (currentValue) => {
+                return (currentValue || 0) + 1;
+            });
+        };
+    </script>
+</body>
+</html>
